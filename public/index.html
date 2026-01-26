@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Is Your HubSpot Tracking Working? | Free Checker Tool | warbble·digital</title>
+  <meta name="description" content="Check if your HubSpot tracking code is installed and firing correctly. Free instant results from Ireland's top HubSpot Diamond Partner.">
+  
+  <!-- Fonts - Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Warbble Brand Colours */
+      --warbble-pink: #EE4D7A;
+      --warbble-blue: #01182E;
+      --warbble-blue-secondary: #003366;
+      --warbble-cream: #E4DAC0;
+      --warbble-white: #FFFFFF;
+      --warbble-grey: #6b7c93;
+      --warbble-light-bg: #f8f9fa;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      overflow-x: hidden;
+    }
+    
+    body {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--warbble-blue);
+      background: var(--warbble-white);
+      overflow-x: hidden;
+      width: 100%;
+      min-width: 320px;
+    }
+    
+    /* Ensure text wraps properly */
+    p, h1, h2, h3, h4, li {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    
+    /* Header */
+    .header {
+      background: var(--warbble-white);
+      padding: 16px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--warbble-blue);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    
+    .logo .dot {
+      color: var(--warbble-pink);
+    }
+    
+    .header-cta {
+      background: var(--warbble-pink);
+      color: var(--warbble-white);
+      padding: 10px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    
+    .header-cta:hover {
+      background: #d63d68;
+      transform: translateY(-1px);
+    }
+    
+    @media (max-width: 480px) {
+      .header {
+        padding: 12px 16px;
+      }
+      
+      .logo {
+        font-size: 18px;
+      }
+      
+      .header-cta {
+        padding: 8px 14px;
+        font-size: 13px;
+      }
+    }
+    
+    /* Hero Section */
+    .hero {
+      background: var(--warbble-blue);
+      color: var(--warbble-white);
+      padding: 80px 24px;
+      text-align: center;
+    }
+    
+    .hero-inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .hero-badge {
+      display: inline-block;
+      background: rgba(238, 77, 122, 0.15);
+      border: 1px solid rgba(238, 77, 122, 0.3);
+      color: var(--warbble-pink);
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+    
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+    
+    .hero h1 span {
+      color: var(--warbble-pink);
+    }
+    
+    .hero-subtitle {
+      font-size: 18px;
+      color: rgba(255,255,255,0.8);
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+    
+    /* Problem Cards */
+    .problems {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .problem-item {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: left;
+    }
+    
+    .problem-item .icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    
+    .problem-item h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .problem-item p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+    }
+    
+    /* Main Content */
+    .main {
+      padding: 60px 24px;
+      background: var(--warbble-light-bg);
+    }
+    
+    .main-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+    
+    @media (max-width: 900px) {
+      .main-inner {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      
+      .form-card {
+        position: relative;
+        top: 0;
+        order: -1; /* Move form to top on mobile */
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .main {
+        padding: 40px 16px;
+      }
+      
+      .hero {
+        padding: 60px 16px;
+      }
+      
+      .problems {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Form Card */
+    .form-card {
+      background: var(--warbble-white);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(1, 24, 46, 0.08);
+      padding: 40px;
+    }
+    
+    @media (min-width: 901px) {
+      .form-card {
+        position: sticky;
+        top: 100px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .form-card {
+        padding: 24px;
+        border-radius: 12px;
+      }
+    }
+    
+    .form-card h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--warbble-blue);
+    }
+    
+    .form-card .subtitle {
+      color: var(--warbble-grey);
+      margin-bottom: 28px;
+      font-size: 15px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--warbble-blue);
+      font-size: 14px;
+    }
+    
+    label .optional {
+      font-weight: 400;
+      color: var(--warbble-grey);
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="url"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--warbble-pink);
+      box-shadow: 0 0 0 3px rgba(238, 77, 122, 0.15);
+    }
+    
+    input::placeholder {
+      color: #9ca3af;
+    }
+    
+    .btn-primary {
+      width: 100%;
+      padding: 16px 24px;
+      background: var(--warbble-pink);
+      color: var(--warbble-white);
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    
+    .btn-primary:hover {
+      background: #d63d68;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(238, 77, 122, 0.4);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    
+    .btn-primary:disabled {
+      background: #d1d5db;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .form-footer {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+    }
+    
+    .form-footer p {
+      font-size: 13px;
+      color: var(--warbble-grey);
+    }
+    
+    .form-footer img {
+      height: 50px;
+      margin-top: 12px;
+      opacity: 0.8;
+    }
+    
+    /* Info Section */
+    .info-section {
+      width: 100%;
+      min-width: 0; /* Prevent grid blowout */
+    }
+    
+    .info-section h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--warbble-blue);
+      margin-bottom: 24px;
+    }
+    
+    @media (max-width: 480px) {
+      .info-section h2 {
+        font-size: 24px;
+      }
+    }
+    
+    .info-section h2 span {
+      color: var(--warbble-pink);
+    }
+    
+    .check-list {
+      margin-bottom: 40px;
+    }
+    
+    .check-item {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: var(--warbble-white);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(1, 24, 46, 0.04);
+    }
+    
+    @media (max-width: 480px) {
+      .check-item {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+      }
+      
+      .check-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
+    }
+    
+    .check-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(238, 77, 122, 0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    
+    .check-content {
+      min-width: 0; /* Allow text to wrap */
+    }
+    
+    .check-content h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--warbble-blue);
+    }
+    
+    .check-content p {
+      font-size: 14px;
+      color: var(--warbble-grey);
+    }
+    
+    /* Why It Matters */
+    .why-matters {
+      background: var(--warbble-white);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 32px;
+    }
+    
+    @media (max-width: 480px) {
+      .why-matters {
+        padding: 20px 16px;
+      }
+    }
+    
+    .why-matters h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--warbble-blue);
+    }
+    
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    @media (max-width: 400px) {
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 16px;
+      background: var(--warbble-light-bg);
+      border-radius: 8px;
+    }
+    
+    .stat-item .number {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--warbble-pink);
+      line-height: 1;
+    }
+    
+    .stat-item .label {
+      font-size: 13px;
+      color: var(--warbble-grey);
+      margin-top: 4px;
+    }
+    
+    /* FAQ Section */
+    .faq-section {
+      background: var(--warbble-white);
+      border-radius: 12px;
+      padding: 28px;
+    }
+    
+    @media (max-width: 480px) {
+      .faq-section {
+        padding: 20px 16px;
+      }
+    }
+    
+    .faq-section h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--warbble-blue);
+    }
+    
+    .faq-item {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 0;
+    }
+    
+    .faq-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    
+    .faq-item h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--warbble-blue);
+    }
+    
+    .faq-item p {
+      font-size: 14px;
+      color: var(--warbble-grey);
+      line-height: 1.6;
+    }
+    
+    /* Loading State */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .loading.show {
+      display: block;
+    }
+    
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--warbble-light-bg);
+      border-top-color: var(--warbble-pink);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading p {
+      color: var(--warbble-blue);
+      font-weight: 500;
+    }
+    
+    .loading .subtext {
+      color: var(--warbble-grey);
+      font-size: 14px;
+      font-weight: 400;
+      margin-top: 4px;
+    }
+    
+    /* Results */
+    .result {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    .result.show {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .result-header {
+      text-align: center;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .result.positive .result-header {
+      background: linear-gradient(135deg, #e6fff9 0%, #ccfff0 100%);
+      border: 1px solid #10b981;
+    }
+    
+    .result.negative .result-header {
+      background: linear-gradient(135deg, #fff0f0 0%, #ffe6e6 100%);
+      border: 1px solid #f87171;
+    }
+    
+    .result.unsure .result-header {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border: 1px solid #f59e0b;
+    }
+    
+    .result.error .result-header {
+      background: var(--warbble-light-bg);
+      border: 1px solid #d1d5db;
+    }
+    
+    .result-icon {
+      font-size: 56px;
+      margin-bottom: 12px;
+    }
+    
+    .result-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .result.positive .result-title { color: #047857; }
+    .result.negative .result-title { color: #dc2626; }
+    .result.unsure .result-title { color: #b45309; }
+    .result.error .result-title { color: var(--warbble-grey); }
+    
+    .result-message {
+      font-size: 15px;
+      color: var(--warbble-grey);
+    }
+    
+    .portal-info {
+      background: var(--warbble-light-bg);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    
+    .portal-info .label {
+      font-size: 13px;
+      color: var(--warbble-grey);
+      margin-bottom: 4px;
+    }
+    
+    .portal-id {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+      color: var(--warbble-blue);
+    }
+    
+    .portal-verify {
+      font-size: 13px;
+      color: var(--warbble-grey);
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #e5e7eb;
+    }
+    
+    .portal-verify strong {
+      color: var(--warbble-blue);
+    }
+    
+    .details-list {
+      background: var(--warbble-light-bg);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+    
+    .details-list h4 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--warbble-grey);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    
+    .details-list ul {
+      list-style: none;
+    }
+    
+    .details-list li {
+      font-size: 14px;
+      color: var(--warbble-blue);
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    
+    .details-list li:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    
+    .details-list li::before {
+      content: "→";
+      color: var(--warbble-pink);
+      font-weight: 600;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+      background: var(--warbble-blue);
+      border-radius: 12px;
+      padding: 28px;
+      text-align: center;
+      color: var(--warbble-white);
+    }
+    
+    .cta-section h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .cta-section p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 20px;
+    }
+    
+    .btn-cta {
+      display: inline-block;
+      padding: 14px 32px;
+      background: var(--warbble-pink);
+      color: var(--warbble-white);
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+    
+    .btn-cta:hover {
+      background: #d63d68;
+      transform: translateY(-2px);
+    }
+    
+    .checks-remaining {
+      text-align: center;
+      font-size: 13px;
+      color: var(--warbble-grey);
+      margin-top: 16px;
+    }
+    
+    .check-again {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      color: var(--warbble-pink);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .check-again:hover {
+      text-decoration: underline;
+    }
+    
+    /* Rate Limited */
+    .rate-limited {
+      display: none;
+      text-align: center;
+      padding: 32px;
+    }
+    
+    .rate-limited.show {
+      display: block;
+    }
+    
+    .rate-limited .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    .rate-limited h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--warbble-blue);
+    }
+    
+    .rate-limited p {
+      color: var(--warbble-grey);
+      margin-bottom: 24px;
+    }
+    
+    /* Footer */
+    .footer {
+      background: var(--warbble-blue);
+      color: var(--warbble-white);
+      padding: 60px 24px;
+    }
+    
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px;
+    }
+    
+    @media (max-width: 768px) {
+      .footer {
+        padding: 40px 16px;
+      }
+      
+      .footer-inner {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+    
+    .footer-brand .logo {
+      color: var(--warbble-white);
+      font-size: 22px;
+      font-weight: 700;
+    }
+    
+    .footer-brand p {
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+      margin-top: 16px;
+      max-width: 300px;
+    }
+    
+    .footer-links h4 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+      color: var(--warbble-pink);
+      font-weight: 700;
+    }
+    
+    .footer-links a {
+      display: block;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 6px 0;
+      transition: color 0.2s;
+    }
+    
+    .footer-links a:hover {
+      color: var(--warbble-white);
+    }
+    
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 40px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    .footer-bottom p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+    }
+    
+    .partner-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .partner-badge img {
+      height: 40px;
+    }
+    
+    /* Star decoration (brand element) - disabled for now */
+    .star-decoration {
+      color: inherit;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="https://www.warbble.com" class="logo">warbble<span class="dot">·</span>digital</a>
+      <a href="BOOKING_LINK_HERE" class="header-cta" target="_blank">Book a Free Audit</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="hero-badge">🔍 Free Instant Check</span>
+      <h1>Is Your HubSpot Tracking <span>Actually Working?</span></h1>
+      <p class="hero-subtitle">
+        Broken tracking means lost leads, missing data, and marketing decisions based on incomplete information. Check your site in seconds.
+      </p>
+      
+      <div class="problems">
+        <div class="problem-item">
+          <div class="icon">📉</div>
+          <h3>Incomplete Analytics</h3>
+          <p>Missing visitor data means you can't see what's working</p>
+        </div>
+        <div class="problem-item">
+          <div class="icon">👻</div>
+          <h3>Invisible Leads</h3>
+          <p>Form submissions without tracking lose context</p>
+        </div>
+        <div class="problem-item">
+          <div class="icon">🎯</div>
+          <h3>Broken Attribution</h3>
+          <p>Can't measure ROI if you can't track the journey</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="main-inner">
+      <!-- Info Section -->
+      <div class="info-section">
+        <h2>What We <span>Check</span></h2>
+        
+        <div class="check-list">
+          <div class="check-item">
+            <div class="check-icon">📜</div>
+            <div class="check-content">
+              <h3>Tracking Script Present</h3>
+              <p>We verify the HubSpot tracking code is actually in your page source, not just promised by your developer.</p>
+            </div>
+          </div>
+          
+          <div class="check-item">
+            <div class="check-icon">🔥</div>
+            <div class="check-content">
+              <h3>Script Actually Firing</h3>
+              <p>Having code isn't enough — we check if it's executing and setting the cookies HubSpot needs.</p>
+            </div>
+          </div>
+          
+          <div class="check-item">
+            <div class="check-icon">🆔</div>
+            <div class="check-content">
+              <h3>Portal ID Detection</h3>
+              <p>We identify which HubSpot portal the tracking belongs to, so you can verify it's actually yours.</p>
+            </div>
+          </div>
+          
+          <div class="check-item">
+            <div class="check-icon">🚫</div>
+            <div class="check-content">
+              <h3>Common Blockers</h3>
+              <p>Cookie banners, ad blockers, and JavaScript errors can silently break tracking. We help identify these issues.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="why-matters">
+          <h3>Why This Matters</h3>
+          <div class="stat-grid">
+            <div class="stat-item">
+              <div class="number">47%</div>
+              <div class="label">of HubSpot users have tracking issues</div>
+            </div>
+            <div class="stat-item">
+              <div class="number">3x</div>
+              <div class="label">better lead scoring with complete data</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="faq-section">
+          <h3>Common Questions</h3>
+          
+          <div class="faq-item">
+            <h4>What if I get an "unsure" result?</h4>
+            <p>This usually means your tracking code is present but something is preventing it from firing — often a cookie consent banner or JavaScript conflict. We can help you diagnose the exact issue.</p>
+          </div>
+          
+          <div class="faq-item">
+            <h4>How do I verify the Portal ID is mine?</h4>
+            <p>In your HubSpot account, go to Settings → Account Management → Account Defaults. Your Hub ID is displayed at the top — it should match what we detect.</p>
+          </div>
+          
+          <div class="faq-item">
+            <h4>I have tracking on some pages but not others</h4>
+            <p>This is more common than you'd think, especially with custom landing pages or third-party tools. Test multiple URLs to get the full picture.</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Form Card -->
+      <div class="form-card">
+        <h2>Check Your Tracking</h2>
+        <p class="subtitle">Enter your website URL for an instant diagnosis</p>
+        
+        <form id="checker-form">
+          <div class="form-group">
+            <label for="url">Website URL</label>
+            <input 
+              type="url" 
+              id="url" 
+              name="url" 
+              placeholder="https://yourwebsite.com" 
+              required
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="name">Your Name <span class="optional">(optional)</span></label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              placeholder="John Smith"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Work Email <span class="optional">(optional)</span></label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="john@company.com"
+            >
+          </div>
+          
+          <button type="submit" class="btn-primary" id="submit-btn">Check My Tracking →</button>
+          
+          <div class="form-footer">
+            <p>Free tool from Ireland's top HubSpot experts</p>
+            <img src="https://www.hubspot.com/hubfs/assets/hubspot.com/badges/diamond-badge-color.svg" alt="HubSpot Diamond Partner">
+          </div>
+        </form>
+        
+        <!-- Loading State -->
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>Analysing your website...</p>
+          <p class="subtext">This takes 5–10 seconds</p>
+        </div>
+        
+        <!-- Rate Limited State -->
+        <div class="rate-limited" id="rate-limited">
+          <div class="icon">⏰</div>
+          <h3>Daily Limit Reached</h3>
+          <p>You can check up to 2 URLs per day. Come back tomorrow, or let us run a full audit for you.</p>
+          <a href="BOOKING_LINK_HERE" class="btn-cta" target="_blank">Book a Free Audit Instead</a>
+        </div>
+        
+        <!-- Results -->
+        <div class="result" id="result">
+          <div class="result-header">
+            <div class="result-icon" id="result-icon"></div>
+            <h3 class="result-title" id="result-title"></h3>
+            <p class="result-message" id="result-message"></p>
+          </div>
+          
+          <div class="portal-info" id="portal-info" style="display: none;">
+            <div class="label">Portal ID Detected</div>
+            <div class="portal-id" id="portal-id"></div>
+            <p class="portal-verify">
+              Verify this is yours: <strong>Settings → Account Management → Account Defaults</strong>
+            </p>
+          </div>
+          
+          <div class="details-list" id="details-container" style="display: none;">
+            <h4>What We Found</h4>
+            <ul id="details-list"></ul>
+          </div>
+          
+          <div class="cta-section">
+            <h3 id="cta-title">Want Expert Help?</h3>
+            <p id="cta-message">Our HubSpot specialists can diagnose issues and optimise your tracking setup.</p>
+            <a href="BOOKING_LINK_HERE" class="btn-cta" id="booking-link" target="_blank">Book a Free 30-Min Audit</a>
+          </div>
+          
+          <a href="#" class="check-again" id="check-again">← Check Another URL</a>
+          <p class="checks-remaining" id="checks-remaining"></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="logo">warbble<span class="dot">·</span>digital</span>
+        <p>We help ambitious businesses achieve unparalleled clarity, robust cash flow, and accelerated revenue growth through expert HubSpot implementation.</p>
+      </div>
+      
+      <div class="footer-links">
+        <h4>Services</h4>
+        <a href="https://www.warbble.com/hubspot-onboarding" target="_blank">HubSpot Onboarding</a>
+        <a href="https://www.warbble.com/hubspot-monthly-management" target="_blank">Monthly Management</a>
+        <a href="https://www.warbble.com/growth-abm" target="_blank">Account-Based Marketing</a>
+        <a href="https://www.warbble.com/email-marketing" target="_blank">Email Marketing</a>
+      </div>
+      
+      <div class="footer-links">
+        <h4>Company</h4>
+        <a href="https://www.warbble.com/about-us" target="_blank">About Us</a>
+        <a href="https://www.warbble.com/blog" target="_blank">Blog</a>
+        <a href="https://www.warbble.com/contact" target="_blank">Contact</a>
+        <a href="https://meetings.hubspot.com/gregfurlong/round-robin" target="_blank">Book a Meeting</a>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>© 2024 warbble·digital. All rights reserved. Dublin • London • Johannesburg • Cape Town</p>
+      <div class="partner-badge">
+        <img src="https://www.hubspot.com/hubfs/assets/hubspot.com/badges/diamond-badge-color.svg" alt="HubSpot Diamond Partner">
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Configuration - UPDATE THESE
+    const CONFIG = {
+      apiEndpoint: '/api/check',
+      bookingLink: 'BOOKING_LINK_HERE', // Replace with your HubSpot meetings link
+    };
+
+    // Check for debug mode via URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const debugKey = urlParams.get('debug');
+
+    // DOM Elements
+    const form = document.getElementById('checker-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const loading = document.getElementById('loading');
+    const resultDiv = document.getElementById('result');
+    const rateLimited = document.getElementById('rate-limited');
+    const checksRemaining = document.getElementById('checks-remaining');
+
+    // Update all booking links
+    document.querySelectorAll('a[href="BOOKING_LINK_HERE"]').forEach(link => {
+      link.href = CONFIG.bookingLink;
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const url = document.getElementById('url').value;
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+
+      // Show loading
+      form.style.display = 'none';
+      loading.classList.add('show');
+      resultDiv.classList.remove('show');
+      rateLimited.classList.remove('show');
+      checksRemaining.textContent = '';
+
+      try {
+        const response = await fetch(CONFIG.apiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url, name, email, debug: debugKey }),
+        });
+
+        const data = await response.json();
+
+        loading.classList.remove('show');
+
+        if (response.status === 429 || data.status === 'rate_limited') {
+          rateLimited.classList.add('show');
+          return;
+        }
+
+        displayResult(data);
+
+        // Lead data is now saved via the API directly to HubSpot
+
+      } catch (error) {
+        console.error('Error:', error);
+        loading.classList.remove('show');
+        displayResult({
+          status: 'error',
+          message: 'An error occurred while checking the URL. Please try again.',
+          details: [],
+        });
+      }
+    });
+
+    function displayResult(data) {
+      resultDiv.className = `result show ${data.status}`;
+      
+      const icons = {
+        positive: '✅',
+        negative: '❌',
+        unsure: '⚠️',
+        error: '🔍',
+      };
+
+      const titles = {
+        positive: 'Tracking Is Working!',
+        negative: 'No Tracking Found',
+        unsure: 'Potential Issues Detected',
+        error: 'Unable to Check',
+      };
+
+      const ctaTitles = {
+        positive: 'Get More From Your Data',
+        negative: 'Let Us Fix This For You',
+        unsure: 'We Can Help Diagnose This',
+        error: 'Need Help?',
+      };
+
+      const ctaMessages = {
+        positive: 'Your tracking is working, but are you using it to its full potential? Our experts can help you leverage your HubSpot data for better results.',
+        negative: 'Missing tracking means missing opportunities. Our team can get your HubSpot tracking installed correctly in no time.',
+        unsure: 'Something is blocking your tracking from working properly. Book a free call and we\'ll identify the exact issue.',
+        error: 'We couldn\'t check this URL automatically. Book a free call and we\'ll investigate manually.',
+      };
+
+      document.getElementById('result-icon').textContent = icons[data.status] || '🔍';
+      document.getElementById('result-title').textContent = titles[data.status] || 'Check Complete';
+      document.getElementById('result-message').textContent = data.message || '';
+      document.getElementById('cta-title').textContent = ctaTitles[data.status] || 'Want Expert Help?';
+      document.getElementById('cta-message').textContent = ctaMessages[data.status] || ctaMessages.positive;
+
+      // Portal info
+      const portalInfo = document.getElementById('portal-info');
+      if (data.portalId) {
+        portalInfo.style.display = 'block';
+        document.getElementById('portal-id').textContent = data.portalId;
+      } else {
+        portalInfo.style.display = 'none';
+      }
+
+      // Details list
+      const detailsContainer = document.getElementById('details-container');
+      const detailsList = document.getElementById('details-list');
+      detailsList.innerHTML = '';
+      
+      if (data.details && data.details.length > 0) {
+        detailsContainer.style.display = 'block';
+        data.details.forEach(detail => {
+          const li = document.createElement('li');
+          li.textContent = detail;
+          detailsList.appendChild(li);
+        });
+      } else {
+        detailsContainer.style.display = 'none';
+      }
+
+      // Checks remaining
+      if (data.debugMode) {
+        checksRemaining.textContent = '🔧 Debug mode — unlimited checks';
+        checksRemaining.style.color = 'var(--warbble-pink)';
+      } else if (data.checksRemaining !== undefined) {
+        checksRemaining.textContent = `${data.checksRemaining} check${data.checksRemaining !== 1 ? 's' : ''} remaining today`;
+        checksRemaining.style.color = '';
+      }
+
+      resultDiv.classList.add('show');
+    }
+
+    // Check another URL
+    document.getElementById('check-again').addEventListener('click', (e) => {
+      e.preventDefault();
+      form.style.display = 'block';
+      resultDiv.classList.remove('show');
+      document.getElementById('url').value = '';
+      document.getElementById('url').focus();
+    });
+  </script>
+</body>
+</html>
