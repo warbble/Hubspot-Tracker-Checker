@@ -30,12 +30,12 @@ test('tracks IPs independently', async () => {
   assert.deepEqual(await rateLimit('2.2.2.2', redis, NOW), { allowed: true, remaining: 1 });
 });
 
-test('sets the daily TTL only on the first request', async () => {
+test('refreshes the daily TTL on every request', async () => {
   let expireCalls = 0;
   const redis = makeFakeRedis({ async expire() { expireCalls += 1; return 1; } });
   await rateLimit('9.9.9.9', redis, NOW);
   await rateLimit('9.9.9.9', redis, NOW);
-  assert.equal(expireCalls, 1);
+  assert.equal(expireCalls, 2);
 });
 
 test('fails open when no Redis client is configured', async () => {
