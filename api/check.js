@@ -2,47 +2,7 @@
 // Uses Browserless.io to render page and verify tracking
 // Stores results in HubSpot as Company records (with optional Contact association)
 
-export const config = {
-  maxDuration: 30, // Allow up to 30 seconds for headless browser
-};
-
-// Rate limiting helper using Upstash Redis REST API
-async function checkRateLimit(ip) {
-  const KV_REST_API_URL = process.env.KV_REST_API_URL;
-  const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN;
-  
-  if (!KV_REST_API_URL || !KV_REST_API_TOKEN) {
-    console.warn('KV environment variables not set - skipping rate limit');
-    return { allowed: true, remaining: 999 };
-  }
-  
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  const key = `rate:${ip}:${today}`;
-  
-  try {
-    // Get current count
-    const getResponse = await fetch(`${KV_REST_API_URL}/get/${key}`, {
-      headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
-    });
-    const getData = await getResponse.json();
-    const count = getData.result ? parseInt(getData.result, 10) : 0;
-    
-    if (count >= 2) {
-      return { allowed: false, remaining: 0 };
-    }
-    
-    // Increment count with 24 hour expiry
-    await fetch(`${KV_REST_API_URL}/setex/${key}/86400/${count + 1}`, {
-      headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
-    });
-    
-    return { allowed: true, remaining: 2 - (count + 1) };
-  } catch (error) {
-    console.error('Rate limit error:', error);
-    // If rate limiting fails, allow the request
-    return { allowed: true, remaining: 999 };
-  }
-}
+import { checkRateLimit } from '../lib/rateLimit.js';
 
 // Validate and normalize URL
 function normalizeUrl(input) {
@@ -428,7 +388,7 @@ async function saveToHubSpot(domain, trackingResult, contactInfo, hubspotToken) 
 // Main Handler
 // ============================================================
 
-export default async function handler(req, res) {
+export async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
