@@ -4,10 +4,5 @@
     "api/check.js": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "BROWSERLESS_TOKEN": "@browserless_token",
-    "HUBSPOT_TOKEN": "@hubspot_token",
-    "DEBUG_KEY": "@debug_key"
   }
 }

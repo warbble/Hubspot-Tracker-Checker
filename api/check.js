@@ -6,20 +6,42 @@ export const config = {
   maxDuration: 30, // Allow up to 30 seconds for headless browser
 };
 
-// Rate limiting helper using Vercel KV
-async function checkRateLimit(ip, kv) {
+// Rate limiting helper using Upstash Redis REST API
+async function checkRateLimit(ip) {
+  const KV_REST_API_URL = process.env.KV_REST_API_URL;
+  const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN;
+  
+  if (!KV_REST_API_URL || !KV_REST_API_TOKEN) {
+    console.warn('KV environment variables not set - skipping rate limit');
+    return { allowed: true, remaining: 999 };
+  }
+  
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   const key = `rate:${ip}:${today}`;
   
-  const current = await kv.get(key);
-  const count = current ? parseInt(current, 10) : 0;
-  
-  if (count >= 2) {
-    return { allowed: false, remaining: 0 };
+  try {
+    // Get current count
+    const getResponse = await fetch(`${KV_REST_API_URL}/get/${key}`, {
+      headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
+    });
+    const getData = await getResponse.json();
+    const count = getData.result ? parseInt(getData.result, 10) : 0;
+    
+    if (count >= 2) {
+      return { allowed: false, remaining: 0 };
+    }
+    
+    // Increment count with 24 hour expiry
+    await fetch(`${KV_REST_API_URL}/setex/${key}/86400/${count + 1}`, {
+      headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
+    });
+    
+    return { allowed: true, remaining: 2 - (count + 1) };
+  } catch (error) {
+    console.error('Rate limit error:', error);
+    // If rate limiting fails, allow the request
+    return { allowed: true, remaining: 999 };
   }
-  
-  await kv.set(key, count + 1, { ex: 86400 }); // Expires in 24 hours
-  return { allowed: true, remaining: 2 - (count + 1) };
 }
 
 // Validate and normalize URL
@@ -46,20 +68,19 @@ function normalizeUrl(input) {
 // Main check function using Browserless
 async function checkHubSpotTracking(url, browserlessToken) {
   // Use the /content endpoint to get full page content
-  const contentUrl = `https://chrome.browserless.io/content?token=${browserlessToken}`;
+  const contentUrl = `https://production-sfo.browserless.io/content?token=${browserlessToken}`;
+  
+  console.log('Fetching URL:', url);
   
   const response = await fetch(contentUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      url: url,
-      waitFor: 3000,
-      gotoOptions: {
-        waitUntil: 'networkidle2',
-        timeout: 20000,
-      },
+      url: url
     }),
   });
+
+  console.log('Browserless response status:', response.status);
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -68,23 +89,18 @@ async function checkHubSpotTracking(url, browserlessToken) {
   }
 
   const html = await response.text();
+  console.log('HTML length:', html.length);
   
   // Now use /scrape to check for cookies
-  const scrapeUrl = `https://chrome.browserless.io/scrape?token=${browserlessToken}`;
+  const scrapeUrl = `https://production-sfo.browserless.io/scrape?token=${browserlessToken}`;
   const scrapeResponse = await fetch(scrapeUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       url: url,
-      waitFor: 3000,
-      gotoOptions: {
-        waitUntil: 'networkidle2',
-        timeout: 20000,
-      },
       elements: [
         { selector: 'html' }
-      ],
-      cookies: true,
+      ]
     }),
   });
 
@@ -92,6 +108,9 @@ async function checkHubSpotTracking(url, browserlessToken) {
   if (scrapeResponse.ok) {
     const scrapeData = await scrapeResponse.json();
     cookies = scrapeData.cookies || [];
+    console.log('Cookies found:', cookies.length);
+  } else {
+    console.log('Scrape failed:', scrapeResponse.status);
   }
 
   // Analyze results
@@ -454,8 +473,7 @@ export default async function handler(req, res) {
                  req.headers['x-real-ip'] || 
                  'unknown';
       
-      const { kv } = await import('@vercel/kv');
-      rateLimit = await checkRateLimit(ip, kv);
+      rateLimit = await checkRateLimit(ip);
       
       if (!rateLimit.allowed) {
         return res.status(429).json({
@@ -468,6 +486,10 @@ export default async function handler(req, res) {
 
     // Check HubSpot tracking
     const browserlessToken = process.env.BROWSERLESS_TOKEN;
+    console.log('BROWSERLESS_TOKEN exists:', !!browserlessToken);
+    console.log('BROWSERLESS_TOKEN length:', browserlessToken ? browserlessToken.length : 0);
+    console.log('BROWSERLESS_TOKEN first 8 chars:', browserlessToken ? browserlessToken.substring(0, 8) : 'N/A');
+    
     if (!browserlessToken) {
       console.error('BROWSERLESS_TOKEN not configured');
       return res.status(500).json({ 

@@ -6,9 +6,7 @@
     "dev": "vercel dev",
     "deploy": "vercel --prod"
   },
-  "dependencies": {
-    "@vercel/kv": "^2.0.0"
-  },
+  "dependencies": {},
   "engines": {
     "node": ">=18"
   }
