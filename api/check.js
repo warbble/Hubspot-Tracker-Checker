@@ -51,31 +51,9 @@ async function checkHubSpotTracking(url, browserlessToken) {
   const html = await response.text();
   console.log('HTML length:', html.length);
   
-  // Now use /scrape to check for cookies
-  const scrapeUrl = `https://production-sfo.browserless.io/scrape?token=${browserlessToken}`;
-  const scrapeResponse = await fetch(scrapeUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      url: url,
-      elements: [
-        { selector: 'html' }
-      ],
-      cookies: true
-    }),
-  });
-
-  let cookies = [];
-  if (scrapeResponse.ok) {
-    const scrapeData = await scrapeResponse.json();
-    cookies = scrapeData.cookies || [];
-    console.log('Cookies found:', cookies.length);
-  } else {
-    console.log('Scrape failed:', scrapeResponse.status);
-  }
-
-  // Analyze results
-  const result = analyzeTracking(html, cookies, url);
+  // Detection is based on the rendered HTML (HubSpot script tag + portal ID).
+  // Browserless v2 /scrape does not return cookies, so there is no second call.
+  const result = analyzeTracking(html, [], url);
   return result;
 }
 
