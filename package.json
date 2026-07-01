@@ -2,12 +2,14 @@
   "name": "hubspot-tracker-checker",
   "version": "1.0.0",
   "description": "Check if a website has HubSpot tracking code installed and firing",
+  "type": "module",
   "scripts": {
-    "dev": "vercel dev",
-    "deploy": "vercel --prod"
+    "start": "node server.js",
+    "test": "node --test test/"
   },
   "dependencies": {
-    "@vercel/kv": "^2.0.0"
+    "express": "^5.2.1",
+    "ioredis": "^5.11.1"
   },
   "engines": {
     "node": ">=18"

@@ -2,25 +2,8 @@
 // Uses Browserless.io to render page and verify tracking
 // Stores results in HubSpot as Company records (with optional Contact association)
 
-export const config = {
-  maxDuration: 30, // Allow up to 30 seconds for headless browser
-};
-
-// Rate limiting helper using Vercel KV
-async function checkRateLimit(ip, kv) {
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  const key = `rate:${ip}:${today}`;
-  
-  const current = await kv.get(key);
-  const count = current ? parseInt(current, 10) : 0;
-  
-  if (count >= 2) {
-    return { allowed: false, remaining: 0 };
-  }
-  
-  await kv.set(key, count + 1, { ex: 86400 }); // Expires in 24 hours
-  return { allowed: true, remaining: 2 - (count + 1) };
-}
+import { checkRateLimit } from '../lib/rateLimit.js';
+import { isFreeEmail } from '../lib/freeEmailDomains.js';
 
 // Validate and normalize URL
 function normalizeUrl(input) {
@@ -46,20 +29,19 @@ function normalizeUrl(input) {
 // Main check function using Browserless
 async function checkHubSpotTracking(url, browserlessToken) {
   // Use the /content endpoint to get full page content
-  const contentUrl = `https://chrome.browserless.io/content?token=${browserlessToken}`;
+  const contentUrl = `https://production-sfo.browserless.io/content?token=${browserlessToken}`;
+  
+  console.log('Fetching URL:', url);
   
   const response = await fetch(contentUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      url: url,
-      waitFor: 3000,
-      gotoOptions: {
-        waitUntil: 'networkidle2',
-        timeout: 20000,
-      },
+      url: url
     }),
   });
+
+  console.log('Browserless response status:', response.status);
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -68,38 +50,15 @@ async function checkHubSpotTracking(url, browserlessToken) {
   }
 
   const html = await response.text();
+  console.log('HTML length:', html.length);
   
-  // Now use /scrape to check for cookies
-  const scrapeUrl = `https://chrome.browserless.io/scrape?token=${browserlessToken}`;
-  const scrapeResponse = await fetch(scrapeUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      url: url,
-      waitFor: 3000,
-      gotoOptions: {
-        waitUntil: 'networkidle2',
-        timeout: 20000,
-      },
-      elements: [
-        { selector: 'html' }
-      ],
-      cookies: true,
-    }),
-  });
-
-  let cookies = [];
-  if (scrapeResponse.ok) {
-    const scrapeData = await scrapeResponse.json();
-    cookies = scrapeData.cookies || [];
-  }
-
-  // Analyze results
-  const result = analyzeTracking(html, cookies, url);
+  // Detection is based on the rendered HTML (HubSpot script tag + portal ID).
+  // Browserless v2 /scrape does not return cookies, so there is no second call.
+  const result = analyzeTracking(html, [], url);
   return result;
 }
 
-function analyzeTracking(html, cookies, checkedUrl) {
+export function analyzeTracking(html, cookies, checkedUrl) {
   const result = {
     status: 'negative',
     portalId: null,
@@ -152,14 +111,17 @@ function analyzeTracking(html, cookies, checkedUrl) {
     }
   }
 
-  // Determine final status
+  // Determine final status. A found script + portal ID means the tracking code
+  // is installed; detected cookies additionally confirm it fired during our
+  // (headless) visit - often blocked by consent banners even when tracking works.
   if (result.scriptFound && result.cookiesFound) {
     result.status = 'positive';
     result.message = 'HubSpot tracking code is installed and firing correctly';
-  } else if (result.scriptFound && !result.cookiesFound) {
-    result.status = 'unsure';
-    result.message = 'HubSpot tracking code found but may not be firing correctly';
-    result.details.push('Possible causes: cookie consent banner blocking, ad blocker, JavaScript error, or code loaded conditionally');
+    result.details.push('Firing confirmed: HubSpot cookies were set on page load');
+  } else if (result.scriptFound) {
+    result.status = 'positive';
+    result.message = 'HubSpot tracking code is installed';
+    result.details.push('Tracking script and portal ID detected. Cookie firing was not confirmed in this headless check (commonly a cookie consent banner), but the tracking code is present.');
   } else {
     result.status = 'negative';
     result.message = 'No HubSpot tracking code detected on this page';
@@ -409,7 +371,7 @@ async function saveToHubSpot(domain, trackingResult, contactInfo, hubspotToken) 
 // Main Handler
 // ============================================================
 
-export default async function handler(req, res) {
+export async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -424,7 +386,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { url, name, email, debug } = req.body;
+    const { url, name, email, debug } = req.body || {};
 
     if (!url) {
       return res.status(400).json({ 
@@ -442,6 +404,14 @@ export default async function handler(req, res) {
       });
     }
 
+    // Business emails only — reject free / personal / disposable providers
+    if (email && isFreeEmail(email)) {
+      return res.status(400).json({
+        status: 'error',
+        error: 'Please use your work email address. Free and personal email providers aren\'t accepted.',
+      });
+    }
+
     // Check for debug mode (bypasses rate limiting)
     const debugKey = process.env.DEBUG_KEY;
     const isDebugMode = debugKey && debug === debugKey;
@@ -454,8 +424,7 @@ export default async function handler(req, res) {
                  req.headers['x-real-ip'] || 
                  'unknown';
       
-      const { kv } = await import('@vercel/kv');
-      rateLimit = await checkRateLimit(ip, kv);
+      rateLimit = await checkRateLimit(ip);
       
       if (!rateLimit.allowed) {
         return res.status(429).json({
@@ -468,6 +437,8 @@ export default async function handler(req, res) {
 
     // Check HubSpot tracking
     const browserlessToken = process.env.BROWSERLESS_TOKEN;
+    console.log('BROWSERLESS_TOKEN configured:', !!browserlessToken);
+
     if (!browserlessToken) {
       console.error('BROWSERLESS_TOKEN not configured');
       return res.status(500).json({ 

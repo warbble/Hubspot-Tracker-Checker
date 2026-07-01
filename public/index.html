@@ -175,6 +175,7 @@
     .problem-item .icon {
       font-size: 24px;
       margin-bottom: 8px;
+      color: var(--warbble-pink);
     }
     
     .problem-item h3 {
@@ -414,6 +415,7 @@
       justify-content: center;
       font-size: 24px;
       flex-shrink: 0;
+      color: var(--warbble-pink);
     }
     
     .check-content {
@@ -611,6 +613,23 @@
       font-size: 56px;
       margin-bottom: 12px;
     }
+
+    .result.positive .result-icon { color: #047857; }
+    .result.negative .result-icon { color: #dc2626; }
+    .result.unsure .result-icon { color: #d97706; }
+    .result.error .result-icon { color: var(--warbble-grey); }
+
+    .hero-badge svg,
+    .problem-item .icon svg,
+    .check-icon svg,
+    .result-icon svg,
+    .rate-limited .icon svg {
+      width: 1em;
+      height: 1em;
+      vertical-align: middle;
+      display: inline-block;
+      flex-shrink: 0;
+    }
     
     .result-title {
       font-size: 22px;
@@ -775,6 +794,7 @@
     .rate-limited .icon {
       font-size: 48px;
       margin-bottom: 16px;
+      color: var(--warbble-pink);
     }
     
     .rate-limited h3 {
@@ -881,6 +901,27 @@
     .partner-badge img {
       height: 40px;
     }
+
+    /* Self-contained partner badge (fallback until the official image is hosted) */
+    .hs-partner-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: #ff5c35;
+      background: rgba(255, 92, 53, 0.08);
+      border: 1.5px solid rgba(255, 92, 53, 0.5);
+      border-radius: 50px;
+      padding: 6px 14px;
+      white-space: nowrap;
+    }
+    .hs-partner-badge svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
     
     /* Star decoration (brand element) - disabled for now */
     .star-decoration {
@@ -900,7 +941,7 @@
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-inner">
-      <span class="hero-badge">🔍 Free Instant Check</span>
+      <span class="hero-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Free Instant Check</span>
       <h1>Is Your HubSpot Tracking <span>Actually Working?</span></h1>
       <p class="hero-subtitle">
         Broken tracking means lost leads, missing data, and marketing decisions based on incomplete information. Check your site in seconds.
@@ -908,17 +949,17 @@
       
       <div class="problems">
         <div class="problem-item">
-          <div class="icon">📉</div>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg></div>
           <h3>Incomplete Analytics</h3>
           <p>Missing visitor data means you can't see what's working</p>
         </div>
         <div class="problem-item">
-          <div class="icon">👻</div>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg></div>
           <h3>Invisible Leads</h3>
           <p>Form submissions without tracking lose context</p>
         </div>
         <div class="problem-item">
-          <div class="icon">🎯</div>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
           <h3>Broken Attribution</h3>
           <p>Can't measure ROI if you can't track the journey</p>
         </div>
@@ -935,7 +976,7 @@
         
         <div class="check-list">
           <div class="check-item">
-            <div class="check-icon">📜</div>
+            <div class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
             <div class="check-content">
               <h3>Tracking Script Present</h3>
               <p>We verify the HubSpot tracking code is actually in your page source, not just promised by your developer.</p>
@@ -943,7 +984,7 @@
           </div>
           
           <div class="check-item">
-            <div class="check-icon">🔥</div>
+            <div class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
             <div class="check-content">
               <h3>Script Actually Firing</h3>
               <p>Having code isn't enough — we check if it's executing and setting the cookies HubSpot needs.</p>
@@ -951,7 +992,7 @@
           </div>
           
           <div class="check-item">
-            <div class="check-icon">🆔</div>
+            <div class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div>
             <div class="check-content">
               <h3>Portal ID Detection</h3>
               <p>We identify which HubSpot portal the tracking belongs to, so you can verify it's actually yours.</p>
@@ -959,7 +1000,7 @@
           </div>
           
           <div class="check-item">
-            <div class="check-icon">🚫</div>
+            <div class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div>
             <div class="check-content">
               <h3>Common Blockers</h3>
               <p>Cookie banners, ad blockers, and JavaScript errors can silently break tracking. We help identify these issues.</p>
@@ -1036,13 +1077,14 @@
               name="email" 
               placeholder="john@company.com"
             >
+            <small class="field-error" id="email-error" style="display:none;color:#dc2626;font-size:13px;margin-top:6px;font-weight:500;"></small>
           </div>
           
           <button type="submit" class="btn-primary" id="submit-btn">Check My Tracking →</button>
           
           <div class="form-footer">
             <p>Free tool from Ireland's top HubSpot experts</p>
-            <img src="https://www.hubspot.com/hubfs/assets/hubspot.com/badges/diamond-badge-color.svg" alt="HubSpot Diamond Partner">
+            <span class="hs-partner-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg> HubSpot Diamond Solutions Partner</span>
           </div>
         </form>
         
@@ -1055,7 +1097,7 @@
         
         <!-- Rate Limited State -->
         <div class="rate-limited" id="rate-limited">
-          <div class="icon">⏰</div>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
           <h3>Daily Limit Reached</h3>
           <p>You can check up to 2 URLs per day. Come back tomorrow, or let us run a full audit for you.</p>
           <a href="BOOKING_LINK_HERE" class="btn-cta" target="_blank">Book a Free Audit Instead</a>
@@ -1121,9 +1163,9 @@
     </div>
     
     <div class="footer-bottom">
-      <p>© 2024 warbble·digital. All rights reserved. Dublin • London • Johannesburg • Cape Town</p>
+      <p>© <span id="copyright-year">2026</span> warbble·digital. All rights reserved. Dublin • London • Johannesburg • Cape Town</p>
       <div class="partner-badge">
-        <img src="https://www.hubspot.com/hubfs/assets/hubspot.com/badges/diamond-badge-color.svg" alt="HubSpot Diamond Partner">
+        <span class="hs-partner-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg> HubSpot Diamond Solutions Partner</span>
       </div>
     </div>
   </footer>
@@ -1132,8 +1174,12 @@
     // Configuration - UPDATE THESE
     const CONFIG = {
       apiEndpoint: '/api/check',
-      bookingLink: 'BOOKING_LINK_HERE', // Replace with your HubSpot meetings link
+      bookingLink: 'https://meetings.hubspot.com/gregfurlong/round-robin', // Replace with your HubSpot meetings link
     };
+
+    // Keep the footer copyright year current automatically
+    const yearEl = document.getElementById('copyright-year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
 
     // Check for debug mode via URL parameter
     const urlParams = new URLSearchParams(window.location.search);
@@ -1152,12 +1198,55 @@
       link.href = CONFIG.bookingLink;
     });
 
+    // Free / personal / disposable email domains to block (business emails only).
+    // Keep in sync with lib/freeEmailDomains.js.
+    const FREE_EMAIL_DOMAINS = new Set([
+      'gmail.com','googlemail.com','yahoo.com','yahoo.co.uk','yahoo.ca','yahoo.com.au',
+      'yahoo.fr','yahoo.de','yahoo.es','yahoo.it','yahoo.in','yahoo.co.in','ymail.com',
+      'rocketmail.com','hotmail.com','hotmail.co.uk','hotmail.fr','hotmail.de','hotmail.it',
+      'hotmail.es','hotmail.ca','outlook.com','outlook.co.uk','outlook.fr','outlook.de',
+      'outlook.es','outlook.it','live.com','live.co.uk','live.fr','live.ca','msn.com',
+      'windowslive.com','aol.com','aim.com','aol.co.uk','icloud.com','me.com','mac.com',
+      'protonmail.com','proton.me','pm.me','gmx.com','gmx.net','gmx.de','gmx.co.uk',
+      'mail.com','email.com','usa.com','yandex.com','yandex.ru','ya.ru','mail.ru','list.ru',
+      'bk.ru','inbox.ru','zoho.com','zohomail.com','fastmail.com','hushmail.com',
+      'tutanota.com','tuta.io','hey.com','qq.com','163.com','126.com','sina.com','sohu.com',
+      'naver.com','hanmail.net','daum.net','nate.com','rediffmail.com','comcast.net',
+      'verizon.net','att.net','sbcglobal.net','bellsouth.net','cox.net','charter.net',
+      'earthlink.net','roadrunner.com','frontier.com','btinternet.com','sky.com',
+      'virginmedia.com','talktalk.net','ntlworld.com','blueyonder.co.uk','orange.fr',
+      'wanadoo.fr','free.fr','laposte.net','sfr.fr','web.de','t-online.de','freenet.de',
+      'libero.it','virgilio.it','tin.it','alice.it','telstra.com','bigpond.com',
+      'optusnet.com.au','shaw.ca','rogers.com','sympatico.ca','telus.net','xtra.co.nz',
+      'mailinator.com','guerrillamail.com','guerrillamail.info','10minutemail.com',
+      'tempmail.com','temp-mail.org','throwawaymail.com','yopmail.com','trashmail.com',
+      'getnada.com','maildrop.cc','dispostable.com','sharklasers.com','grr.la','spam4.me',
+      'mailnesia.com','mohmal.com','fakeinbox.com','emailondeck.com','moakt.com',
+      'mailcatch.com','mintemail.com',
+    ]);
+    function isFreeEmail(value) {
+      if (!value) return false;
+      const at = value.lastIndexOf('@');
+      if (at === -1) return false;
+      return FREE_EMAIL_DOMAINS.has(value.slice(at + 1).trim().toLowerCase());
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
       const url = document.getElementById('url').value;
       const name = document.getElementById('name').value;
       const email = document.getElementById('email').value;
+
+      // Block free / personal email domains before doing anything
+      const emailError = document.getElementById('email-error');
+      emailError.style.display = 'none';
+      if (email && isFreeEmail(email)) {
+        emailError.textContent = 'Please use your work email — free and personal email providers aren\'t accepted.';
+        emailError.style.display = 'block';
+        document.getElementById('email').focus();
+        return;
+      }
 
       // Show loading
       form.style.display = 'none';
@@ -1202,11 +1291,12 @@
     function displayResult(data) {
       resultDiv.className = `result show ${data.status}`;
       
+      const svgIcon = (paths) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
       const icons = {
-        positive: '✅',
-        negative: '❌',
-        unsure: '⚠️',
-        error: '🔍',
+        positive: svgIcon('<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>'),
+        negative: svgIcon('<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>'),
+        unsure: svgIcon('<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),
+        error: svgIcon('<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>'),
       };
 
       const titles = {
@@ -1230,7 +1320,7 @@
         error: 'We couldn\'t check this URL automatically. Book a free call and we\'ll investigate manually.',
       };
 
-      document.getElementById('result-icon').textContent = icons[data.status] || '🔍';
+      document.getElementById('result-icon').innerHTML = icons[data.status] || icons.error;
       document.getElementById('result-title').textContent = titles[data.status] || 'Check Complete';
       document.getElementById('result-message').textContent = data.message || '';
       document.getElementById('cta-title').textContent = ctaTitles[data.status] || 'Want Expert Help?';
@@ -1263,7 +1353,7 @@
 
       // Checks remaining
       if (data.debugMode) {
-        checksRemaining.textContent = '🔧 Debug mode — unlimited checks';
+        checksRemaining.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Debug mode — unlimited checks';
         checksRemaining.style.color = 'var(--warbble-pink)';
       } else if (data.checksRemaining !== undefined) {
         checksRemaining.textContent = `${data.checksRemaining} check${data.checksRemaining !== 1 ? 's' : ''} remaining today`;
