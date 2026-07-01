@@ -901,6 +901,27 @@
     .partner-badge img {
       height: 40px;
     }
+
+    /* Self-contained partner badge (fallback until the official image is hosted) */
+    .hs-partner-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: #ff5c35;
+      background: rgba(255, 92, 53, 0.08);
+      border: 1.5px solid rgba(255, 92, 53, 0.5);
+      border-radius: 50px;
+      padding: 6px 14px;
+      white-space: nowrap;
+    }
+    .hs-partner-badge svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
     
     /* Star decoration (brand element) - disabled for now */
     .star-decoration {
@@ -1063,7 +1084,7 @@
           
           <div class="form-footer">
             <p>Free tool from Ireland's top HubSpot experts</p>
-            <img src="https://www.hubspot.com/hubfs/assets/hubspot.com/badges/diamond-badge-color.svg" alt="HubSpot Diamond Partner">
+            <span class="hs-partner-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg> HubSpot Diamond Solutions Partner</span>
           </div>
         </form>
         
@@ -1142,9 +1163,9 @@
     </div>
     
     <div class="footer-bottom">
-      <p>© 2024 warbble·digital. All rights reserved. Dublin • London • Johannesburg • Cape Town</p>
+      <p>© <span id="copyright-year">2026</span> warbble·digital. All rights reserved. Dublin • London • Johannesburg • Cape Town</p>
       <div class="partner-badge">
-        <img src="https://www.hubspot.com/hubfs/assets/hubspot.com/badges/diamond-badge-color.svg" alt="HubSpot Diamond Partner">
+        <span class="hs-partner-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg> HubSpot Diamond Solutions Partner</span>
       </div>
     </div>
   </footer>
@@ -1155,6 +1176,10 @@
       apiEndpoint: '/api/check',
       bookingLink: 'https://meetings.hubspot.com/gregfurlong/round-robin', // Replace with your HubSpot meetings link
     };
+
+    // Keep the footer copyright year current automatically
+    const yearEl = document.getElementById('copyright-year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
 
     // Check for debug mode via URL parameter
     const urlParams = new URLSearchParams(window.location.search);
