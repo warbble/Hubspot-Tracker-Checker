@@ -4,23 +4,28 @@
 
 This tool allows visitors to check if their website has HubSpot tracking code installed and working correctly. Results are stored as Company records in HubSpot (with optional Contact association).
 
+It runs on **Railway** as a single long-running Express server plus a managed Redis service.
+
 ---
 
 ## Architecture
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Landing Page   │────▶│  Vercel API      │────▶│  Browserless.io │
-│  (Vercel)       │     │  /api/check      │     │  (Headless Chrome)
+│  Landing Page   │────▶│  Express server  │────▶│  Browserless.io │
+│  (public/)      │     │  /api/check      │     │  (Headless Chrome)
 └─────────────────┘     └──────────────────┘     └─────────────────┘
-                                │
-                    ┌───────────┴───────────┐
-                    ▼                       ▼
+   served by the same         │
+   Railway web service        │
+                    ┌──────────┴───────────┐
+                    ▼                      ▼
            ┌──────────────────┐    ┌──────────────────┐
-           │  Vercel KV       │    │  HubSpot API     │
+           │  Railway Redis   │    │  HubSpot API     │
            │  (Rate Limiting) │    │  (Company/Contact)
            └──────────────────┘    └──────────────────┘
 ```
+
+The web service serves `public/index.html` at `/` and handles `POST /api/check` in the same process (`server.js` → `api/check.js`). Rate limiting uses Railway Redis via `ioredis` (`lib/rateLimit.js`).
 
 ---
 
@@ -70,7 +75,7 @@ Go to **Settings → Properties → Company Properties → Create Property**
    - `crm.objects.contacts.read`
    - `crm.objects.contacts.write`
 5. Click **Create app**
-6. Copy the **Access Token** - you'll need this for Vercel
+6. Copy the **Access Token** - you'll need this for Railway
 
 ---
 
@@ -82,78 +87,73 @@ Go to **Settings → Properties → Company Properties → Create Property**
 
 ---
 
-## Step 4: Vercel Setup
+## Step 4: Railway Setup
 
-### 4.1 Create Vercel Account
-1. Go to [vercel.com](https://vercel.com) and sign up
-2. Click **Add New Project**
+The app is a standard Node/Express service — Railway builds it with Nixpacks and runs `npm start`.
 
-### 4.2 Deploy the Project
+### 4.1 Create the project and services
 
-**Option A: GitHub (Recommended)**
-1. Create a new GitHub repository
-2. Push the project files to the repo:
-   ```
-   hubspot-tracker-checker/
-   ├── api/
-   │   └── check.js
-   ├── public/
-   │   └── index.html
-   ├── package.json
-   ├── vercel.json
-   └── .gitignore
-   ```
-3. In Vercel, click **Import Git Repository**
-4. Select your repo and deploy
+Using the Railway CLI from the repo root:
 
-**Option B: Vercel CLI**
 ```bash
-npm install -g vercel
-cd hubspot-tracker-checker
-vercel login
-vercel --prod
+railway init --name hubspot-tracker-checker   # create + link the project
+railway add --database redis                  # add a managed Redis service
+railway add --service web                     # create the web (app) service
+```
+
+### 4.2 Wire Redis and deploy
+
+```bash
+# Reference the Redis service's URL from the web service
+railway variable set 'REDIS_URL=${{Redis.REDIS_URL}}' --service web
+
+# Deploy the current directory to the web service
+railway up --service web
 ```
 
 ### 4.3 Configure Environment Variables
 
-In **Vercel Dashboard → Your Project → Settings → Environment Variables**:
+In **Railway Dashboard → web service → Variables** (or `railway variable set KEY=value --service web`):
 
 | Variable | Value | Notes |
 |----------|-------|-------|
 | `BROWSERLESS_TOKEN` | Your browserless.io token | Required |
 | `HUBSPOT_TOKEN` | Your HubSpot private app token | Required |
+| `DEBUG_KEY` | Any secret string | Optional — `?debug=<value>` bypasses rate limiting |
 
-### 4.4 Enable Vercel KV (Rate Limiting)
+`REDIS_URL` is set in 4.2 as a reference to the Redis service. `PORT` is injected by Railway automatically. Saving variables triggers a redeploy.
 
-1. In Vercel Dashboard → **Storage** → **Create Database**
-2. Select **KV** (Redis-compatible)
-3. Name it `tracker-checker-kv`
-4. Click **Create**
-5. Connect it to your project (auto-adds env vars)
+### 4.4 Generate a domain
+
+```bash
+railway domain --service web
+```
+
+This returns a public `*.up.railway.app` URL.
 
 ---
 
-## Step 5: Update the Booking Link
+## Step 5: Booking Link
 
-Edit `public/index.html` and replace `BOOKING_LINK_HERE` with your HubSpot meetings link:
+The booking link lives in `public/index.html`:
 
 ```javascript
 const CONFIG = {
   apiEndpoint: '/api/check',
-  bookingLink: 'https://meetings.hubspot.com/warbble/consultation', // Your link here
+  bookingLink: 'https://meetings.hubspot.com/gregfurlong/round-robin',
 };
 ```
 
-Also update the booking links in the HTML (search for `BOOKING_LINK_HERE`).
+The front-end rewrites every `href="BOOKING_LINK_HERE"` placeholder to `CONFIG.bookingLink` at load time, so update `CONFIG` — not each link.
 
 ---
 
 ## Step 6: (Optional) Custom Domain
 
-In Vercel:
-1. Go to **Settings → Domains**
+In Railway:
+1. Go to the **web service → Settings → Networking → Custom Domain** (or `railway domain <your-domain>`)
 2. Add your domain (e.g., `tracker.warbble.digital`)
-3. Update DNS as instructed
+3. Add the CNAME record Railway shows you to your DNS
 
 ---
 
@@ -165,14 +165,16 @@ In Vercel:
 |----------|-------------|----------|
 | `BROWSERLESS_TOKEN` | API token from browserless.io | Yes |
 | `HUBSPOT_TOKEN` | Private app token from HubSpot | Yes |
-| `KV_REST_API_URL` | Auto-set by Vercel KV | Yes |
-| `KV_REST_API_TOKEN` | Auto-set by Vercel KV | Yes |
+| `REDIS_URL` | Redis connection URL (Railway reference `${{Redis.REDIS_URL}}`) | Yes |
+| `DEBUG_KEY` | Secret that bypasses rate limiting when passed as `debug` | No |
+| `PORT` | Port to listen on (injected by Railway) | Auto |
 
 ### Rate Limiting
 
 - **Default:** 2 checks per IP per day
-- **To change:** Edit `checkRateLimit()` in `/api/check.js`
-- **Storage:** Vercel KV with 24-hour expiry
+- **To change:** Edit `DAILY_LIMIT` in `lib/rateLimit.js`
+- **Storage:** Railway Redis with a 24-hour key TTL
+- **Fails open:** if `REDIS_URL` is unset or Redis errors, requests are allowed
 
 ---
 
@@ -182,17 +184,17 @@ In Vercel:
 
 | URL | Expected Result |
 |-----|-----------------|
-| `https://www.hubspot.com` | Positive (has tracking) |
+| `https://www.hubspot.com` | Script + portal ID detected (currently reports `unsure` — see note) |
 | `https://www.wikipedia.org` | Negative (no HubSpot) |
 | `https://invalid-url-12345.com` | Error (unreachable) |
+
+> **Note:** the `/scrape` call in `api/check.js` does not currently request cookies, so `cookiesFound` is always false and sites with real HubSpot tracking report `unsure` rather than `positive` (the script and portal ID are still detected). Restoring cookie retrieval from Browserless is a known follow-up.
 
 ### Local Development
 
 ```bash
-npm install -g vercel
-vercel link
-vercel env pull
-vercel dev
+railway run npm start   # runs locally with Railway env vars (incl. REDIS_URL) injected
+npm test                # unit + smoke tests (node --test)
 ```
 
 ---
@@ -200,17 +202,17 @@ vercel dev
 ## Troubleshooting
 
 ### "Service configuration error"
-- Check `BROWSERLESS_TOKEN` is set in Vercel
+- Check `BROWSERLESS_TOKEN` is set on the web service
 - Verify token is valid at browserless.io
 
 ### Company not appearing in HubSpot
 - Check `HUBSPOT_TOKEN` is set
 - Verify private app has correct scopes
-- Check Vercel function logs for errors
+- Check Railway deploy logs (`railway logs --service web`) for errors
 
 ### Rate limiting not working
-- Ensure Vercel KV is connected
-- Check KV env vars are present
+- Ensure the Redis service is running and `REDIS_URL` is set on the web service
+- The limiter fails open, so a missing/broken Redis silently disables it
 
 ### "Property doesn't exist" error
 - Create the custom properties in HubSpot first (Step 1)
@@ -222,12 +224,15 @@ vercel dev
 
 ```
 hubspot-tracker-checker/
+├── server.js             # Express entry point (serves public/ + mounts /api/check)
 ├── api/
-│   └── check.js          # Main API - tracking check + HubSpot save
+│   └── check.js          # API handler - tracking check + HubSpot save
+├── lib/
+│   └── rateLimit.js      # Redis-backed rate limiter
 ├── public/
 │   └── index.html        # Front-end interface
-├── package.json          # Dependencies (@vercel/kv)
-├── vercel.json           # Vercel configuration
+├── test/                 # node --test suites (rateLimit, server)
+├── package.json          # ESM; deps: express, ioredis
 └── README.md             # This file
 ```
 
@@ -246,6 +251,7 @@ hubspot-tracker-checker/
 
 ## Future Enhancements
 
+- [ ] Restore cookie detection in the Browserless `/scrape` call so real tracking reports `positive`
 - [ ] Add "Check Another URL" button after results
 - [ ] Email results to user
 - [ ] Webhook to Slack when new lead captured

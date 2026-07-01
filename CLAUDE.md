@@ -6,56 +6,53 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A single-purpose lead-gen tool: a public landing page where a visitor enters a website URL, and the backend reports whether that site has HubSpot tracking code installed and firing. Every check is written to HubSpot CRM as a Company record (and optional Contact), so the tool doubles as a lead capture funnel.
 
+Deployed on **Railway** as one long-running Express service plus a managed **Redis** service. (It previously ran on Vercel as a serverless function + Vercel KV; that migration is documented in `docs/superpowers/specs/` and `docs/superpowers/plans/`.)
+
 ## Commands
 
 ```bash
-npm run dev        # vercel dev — runs the static site + serverless function locally
-npm run deploy     # vercel --prod
+npm start                  # node server.js — the Express server (serves public/ + /api/check)
+npm test                   # node --test test/ — the unit + smoke tests
+railway run npm start      # run locally with Railway env vars injected (incl. REDIS_URL)
+railway up                 # deploy the current directory to Railway
 ```
 
-Local dev requires Vercel env vars pulled down first (one-time):
-
-```bash
-vercel link        # link to the Vercel project
-vercel env pull    # writes .env.local (gitignored)
-```
-
-There is **no build step, no lint, and no test runner**. `dependencies` in `package.json` is empty — everything uses native `fetch`. The root file named `test` is a stray artifact (`git show 373aacd`), not a test suite.
+`npm test` runs the built-in Node test runner (no framework); tests live in `test/`. There is **no build step and no linter** — everything is ESM (`"type": "module"`) run directly on Node ≥18, with only `express` and `ioredis` as dependencies.
 
 ## Architecture
 
-Two files do all the work:
+Three source files do the work, plus the front end:
 
-- **`public/index.html`** — self-contained front end (HTML + inline CSS + inline JS, ~1300 lines, no framework). Posts `{ url, name, email, debug }` to the API and renders the result. `CONFIG.bookingLink` near the bottom holds the HubSpot meetings URL; the JS rewrites every `href="BOOKING_LINK_HERE"` placeholder to that value at load time, so update `CONFIG`, not each link.
-- **`api/check.js`** — the only serverless function (`POST /api/check`). A standard Vercel Node handler (`export default async function handler(req, res)`).
+- **`server.js`** — process entry point. `createApp()` builds the Express app (`express.json()` → `app.all('/api/check', handler)` → `express.static('public')`) and is exported for tests; the server calls `listen(process.env.PORT || 3000)` only when run as the main module. HTTP wiring only, no business logic.
+- **`api/check.js`** — exports `handler(req, res)`, the single API route. Contains all tracking-detection and HubSpot CRM logic. Ported almost verbatim from the Vercel function (Vercel's `req.body` / `res.status().json()` match Express's shapes).
+- **`lib/rateLimit.js`** — Redis-backed limiter. Exports `checkRateLimit(ip)`; `rateLimit(ip, redis, now)` is the injectable core used by tests.
+- **`public/index.html`** — self-contained front end (HTML + inline CSS + inline JS, no framework). Posts `{ url, name, email, debug }` to `/api/check` on a relative path. `CONFIG.bookingLink` near the bottom holds the HubSpot meetings URL; the JS rewrites every `href="BOOKING_LINK_HERE"` placeholder to that value at load time, so update `CONFIG`, not each link.
 
-The request flow inside `check.js`:
+Request flow inside `handler`:
 
-1. **Rate limit** (`checkRateLimit`) — 2 checks per IP per day, stored in Vercel KV / Upstash Redis via its REST API (not a client lib). Fails open: if KV is unreachable or unconfigured, the request is allowed. Bypassed when the request's `debug` field equals `process.env.DEBUG_KEY`.
-2. **Detection** (`checkHubSpotTracking` → `analyzeTracking`) — calls Browserless.io twice: `/content` for rendered HTML, `/scrape` for cookies. Tracking presence is decided by two signals:
-   - *script found* — regex match for `js.hs-scripts.com/<portalId>.js` or `js.hs-analytics.net/.../<portalId>.js` in the HTML (this is also where `portalId` is extracted).
-   - *cookies found* — any of `__hstc`, `__hssc`, `__hssrc`, `hubspotutk` present.
-   - Status: `positive` (script + cookies), `unsure` (script but no cookies — likely consent banner / ad blocker), `negative` (no script).
-3. **CRM write** (`saveToHubSpot`) — upserts a Company by `domain` (search → create or update), and if an email was supplied, upserts a Contact by email and associates it to the company. HubSpot failures are caught and swallowed so they never fail the user-facing check.
+1. **Rate limit** (`lib/rateLimit.js`) — 2 checks per IP per day via Redis `INCR` + `EXPIRE` (`rate:<ip>:<UTC-day>`). **Fails open**: if `REDIS_URL` is unset or Redis errors, the request is allowed. Bypassed when the request's `debug` field equals `process.env.DEBUG_KEY`.
+2. **Detection** (`checkHubSpotTracking` → `analyzeTracking`) — calls Browserless.io twice: `/content` for rendered HTML, `/scrape` for cookies. `positive` = HubSpot script regex match **and** a HubSpot cookie (`__hstc`/`hubspotutk`/…); `unsure` = script but no cookie; `negative` = no script. The portal ID is extracted from the script URL.
+3. **CRM write** (`saveToHubSpot`) — upserts a Company by `domain`, and if an email was supplied, upserts a Contact by email and associates it. HubSpot failures are caught and swallowed so they never fail the user-facing check.
 
-External services, all via REST + bearer token (no SDKs):
-
-- **Browserless.io** — headless Chrome rendering (`BROWSERLESS_TOKEN`).
-- **HubSpot CRM v3** — `https://api.hubapi.com/crm/v3/...` (`HUBSPOT_TOKEN`).
-- **Vercel KV / Upstash** — rate-limit counters (`KV_REST_API_URL`, `KV_REST_API_TOKEN`).
+External services, all via REST + bearer token (no SDKs): **Browserless.io** (`BROWSERLESS_TOKEN`), **HubSpot CRM v3** (`HUBSPOT_TOKEN`), **Redis** (`REDIS_URL`, via `ioredis`).
 
 ## Environment variables
 
 | Variable | Purpose | Required |
 |----------|---------|----------|
-| `BROWSERLESS_TOKEN` | Browserless.io rendering — request 500s without it | Yes |
+| `BROWSERLESS_TOKEN` | Browserless.io rendering — `/api/check` 500s without it | Yes |
 | `HUBSPOT_TOKEN` | HubSpot private-app token; CRM save is skipped if absent | Yes (for lead capture) |
-| `KV_REST_API_URL` / `KV_REST_API_TOKEN` | Rate limiting; absence disables it (fails open) | Optional |
+| `REDIS_URL` | Rate-limit backend; on Railway wired as `${{Redis.REDIS_URL}}`. Absence disables limiting (fails open) | Yes on Railway |
 | `DEBUG_KEY` | Secret that, passed as `debug`, bypasses rate limiting | Optional |
+| `PORT` | Injected by Railway; the server binds it | Auto |
+
+## Railway deployment
+
+Project `hubspot-tracker-checker` (workspace "Aktelmiele's Projects") has two services: **web** (this repo, Nixpacks/Railpack build, `npm start`) and **Redis**. `REDIS_URL` on web references the Redis service. Secrets (`BROWSERLESS_TOKEN`, `HUBSPOT_TOKEN`, `DEBUG_KEY`) are set in the Railway dashboard. Deploy with `railway up` from the repo root; `railway up` uploads the working directory (respecting `.gitignore`, so `node_modules`/`.env.local` are excluded).
 
 ## Gotchas when modifying
 
 - **HubSpot custom properties must exist first.** `saveToHubSpot` writes `tracking_status`, `hubspot_portal_id_detected`, `tracking_checked_at`, `tracking_checker_notes` on the Company object. Adding a new property to the write payload requires creating it in HubSpot (Settings → Properties) or the API call 400s. See README.md for the property/scope setup.
-- **`maxDuration` is set in two places** — `vercel.json` and the `export const config` in `check.js`. Keep them in sync (30s) to allow for headless-browser latency.
-- **Detection is HTML/cookie heuristics**, so sites that load HubSpot only after consent, or via uncommon script hosts, surface as `unsure`/`negative`. Tune the regexes in `analyzeTracking` and the cookie list, not the status logic, when adjusting accuracy.
-- `check.js` contains `console.log` lines that print `BROWSERLESS_TOKEN` length and first 8 chars for debugging — remove these if hardening for production.
+- **Detection currently skews to `unsure`.** The `/scrape` call in `checkHubSpotTracking` no longer requests cookies (a prior `cookies: true` was removed), so `cookiesFound` is effectively always false and sites with real HubSpot tracking return `unsure` instead of `positive` (script + portal ID are still detected). Fixing accuracy means restoring cookie retrieval from Browserless (v2 `production-sfo` API) — tune the `/scrape` body and the cookie list in `analyzeTracking`, not the status logic.
+- **No per-request timeout on Railway.** Unlike Vercel's `maxDuration: 30`, Railway imposes no function timeout, so the Browserless-latency workaround was dropped. Long renders just run.
+- `api/check.js` contains `console.log` lines that print `BROWSERLESS_TOKEN` length and first 8 chars for debugging — remove these if hardening for production.
