@@ -60,7 +60,8 @@ async function checkHubSpotTracking(url, browserlessToken) {
       url: url,
       elements: [
         { selector: 'html' }
-      ]
+      ],
+      cookies: true
     }),
   });
 
@@ -78,7 +79,7 @@ async function checkHubSpotTracking(url, browserlessToken) {
   return result;
 }
 
-function analyzeTracking(html, cookies, checkedUrl) {
+export function analyzeTracking(html, cookies, checkedUrl) {
   const result = {
     status: 'negative',
     portalId: null,
@@ -131,14 +132,17 @@ function analyzeTracking(html, cookies, checkedUrl) {
     }
   }
 
-  // Determine final status
+  // Determine final status. A found script + portal ID means the tracking code
+  // is installed; detected cookies additionally confirm it fired during our
+  // (headless) visit - often blocked by consent banners even when tracking works.
   if (result.scriptFound && result.cookiesFound) {
     result.status = 'positive';
     result.message = 'HubSpot tracking code is installed and firing correctly';
-  } else if (result.scriptFound && !result.cookiesFound) {
-    result.status = 'unsure';
-    result.message = 'HubSpot tracking code found but may not be firing correctly';
-    result.details.push('Possible causes: cookie consent banner blocking, ad blocker, JavaScript error, or code loaded conditionally');
+    result.details.push('Firing confirmed: HubSpot cookies were set on page load');
+  } else if (result.scriptFound) {
+    result.status = 'positive';
+    result.message = 'HubSpot tracking code is installed';
+    result.details.push('Tracking script and portal ID detected. Cookie firing was not confirmed in this headless check (commonly a cookie consent banner), but the tracking code is present.');
   } else {
     result.status = 'negative';
     result.message = 'No HubSpot tracking code detected on this page';
@@ -403,7 +407,7 @@ export async function handler(req, res) {
   }
 
   try {
-    const { url, name, email, debug } = req.body;
+    const { url, name, email, debug } = req.body || {};
 
     if (!url) {
       return res.status(400).json({ 
@@ -446,10 +450,8 @@ export async function handler(req, res) {
 
     // Check HubSpot tracking
     const browserlessToken = process.env.BROWSERLESS_TOKEN;
-    console.log('BROWSERLESS_TOKEN exists:', !!browserlessToken);
-    console.log('BROWSERLESS_TOKEN length:', browserlessToken ? browserlessToken.length : 0);
-    console.log('BROWSERLESS_TOKEN first 8 chars:', browserlessToken ? browserlessToken.substring(0, 8) : 'N/A');
-    
+    console.log('BROWSERLESS_TOKEN configured:', !!browserlessToken);
+
     if (!browserlessToken) {
       console.error('BROWSERLESS_TOKEN not configured');
       return res.status(500).json({ 

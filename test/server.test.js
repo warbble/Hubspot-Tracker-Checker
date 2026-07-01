@@ -32,3 +32,23 @@ test('GET /api/check returns 405', async () => {
   const res = await fetch(`${baseUrl}/api/check`);
   assert.equal(res.status, 405);
 });
+
+test('POST /api/check with a non-JSON body returns 400, not 500', async () => {
+  const res = await fetch(`${baseUrl}/api/check`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: 'not json',
+  });
+  assert.equal(res.status, 400);
+  assert.equal((await res.json()).status, 'error');
+});
+
+test('POST /api/check with malformed JSON returns a clean 400 (no stack trace)', async () => {
+  const res = await fetch(`${baseUrl}/api/check`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: '{ broken',
+  });
+  assert.equal(res.status, 400);
+  assert.equal((await res.json()).status, 'error');
+});

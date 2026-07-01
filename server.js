@@ -8,6 +8,16 @@ export function createApp() {
   // 200 on OPTIONS) and CORS headers, exactly as on Vercel.
   app.all('/api/check', handler);
   app.use(express.static('public'));
+  // Map body-parser / unexpected errors to a clean JSON response instead of
+  // leaking a stack trace (Express's default error page) to the caller.
+  app.use((err, req, res, _next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    const status = err.status || err.statusCode || 500;
+    res.status(status).json({
+      status: 'error',
+      error: err.type === 'entity.parse.failed' ? 'Invalid JSON body' : 'Internal server error',
+    });
+  });
   return app;
 }
 
