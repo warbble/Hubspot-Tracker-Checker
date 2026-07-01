@@ -52,3 +52,15 @@ test('POST /api/check with malformed JSON returns a clean 400 (no stack trace)',
   assert.equal(res.status, 400);
   assert.equal((await res.json()).status, 'error');
 });
+
+test('POST /api/check with a free-email address is rejected (400)', async () => {
+  const res = await fetch(`${baseUrl}/api/check`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url: 'https://example.com', email: 'someone@gmail.com' }),
+  });
+  assert.equal(res.status, 400);
+  const body = await res.json();
+  assert.equal(body.status, 'error');
+  assert.match(body.error, /work email/i);
+});

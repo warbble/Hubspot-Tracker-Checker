@@ -3,6 +3,7 @@
 // Stores results in HubSpot as Company records (with optional Contact association)
 
 import { checkRateLimit } from '../lib/rateLimit.js';
+import { isFreeEmail } from '../lib/freeEmailDomains.js';
 
 // Validate and normalize URL
 function normalizeUrl(input) {
@@ -400,6 +401,14 @@ export async function handler(req, res) {
       return res.status(400).json({ 
         error: normalized.error,
         status: 'error' 
+      });
+    }
+
+    // Business emails only — reject free / personal / disposable providers
+    if (email && isFreeEmail(email)) {
+      return res.status(400).json({
+        status: 'error',
+        error: 'Please use your work email address. Free and personal email providers aren\'t accepted.',
       });
     }
 
